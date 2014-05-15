@@ -36,10 +36,11 @@ class TareaFinal:
 				if (px == 255):
 					continue
 					#self.img2[x,y]=[255,0,0]
-				print "EQUIS",x,y
+				#print "EQUIS",x,y
 				if (x,y) not in self.filled:
-					print "NOT IN",x,y
+					#print "NOT IN",x,y
 					self.floodFill(x,y)
+			print "MAX ",self.maxArea	
 
 	def floodFill(self,current_x,current_y):
 		total = 0
@@ -59,10 +60,11 @@ class TareaFinal:
 			self.filled.add((x,y))
 			total=total+1
 			#print "To FIll ",toFill
+		#print "TOTAL",total
 		if total > self.maxArea:
 			self.maxArea=total
 	
-	def bootleType(self):
+	def getBottleType(self):
 		print "MAX ",self.maxArea
 		
 	
