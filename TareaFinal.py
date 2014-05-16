@@ -6,21 +6,23 @@ from sets import Set
 class TareaFinal:
 	def loadImages(self):
 		cv2.namedWindow('image')
-		#for picname in glob.glob('img/botella*.jpg'):
-		for picname in glob.glob('img/botella1.jpg'):
+		for picname in glob.glob('img/botella*.jpg'):
+		#for picname in glob.glob('img/botella1.jpg'):
+		#for picname in glob.glob('img/dona.png'):
 			self.img = cv2.imread(picname, cv2.CV_LOAD_IMAGE_GRAYSCALE)
 			self.img2 = cv2.imread(picname)
 			#self.gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-			thresh = 100
+			thresh = 110 #100
 			self.img_binary = cv2.threshold(self.img, thresh, 255, cv2.THRESH_BINARY)[1]
+			self.width, self.height = self.img_binary.shape[:2]
 			#cv2.imwrite('binary_image.png', img_binary)
 			self.getMaxArea()
-			self.getBottleType()
+			#self.getBottleType()
 			
-			if self.maxArea>= 4000:
-				print "Botella OK!"
-			else:
-				print "Botella le falta liquido"
+			#if self.maxArea>= 4000:
+			#	print "Botella OK!"
+			#else:
+			#	print "Botella le falta liquido"
 			
 			cv2.imshow('image',self.img_binary)
 			cv2.imshow('image2',self.img2)
@@ -29,38 +31,42 @@ class TareaFinal:
 	def getMaxArea(self):
 		self.filled = set()
 		self.maxArea=0
-		self.width, self.height = self.img_binary.shape[:2]
+		totalWhite=0
+		totalBlack=0
 		for x in xrange (self.width):
 			for y in xrange (self.height):
 				px = self.img_binary[x,y]
 				if (px == 255):
+					totalWhite=totalWhite+1
 					continue
-					#self.img2[x,y]=[255,0,0]
-				#print "EQUIS",x,y
+				totalBlack=totalBlack+1
 				if (x,y) not in self.filled:
-					#print "NOT IN",x,y
 					self.floodFill(x,y)
-			print "MAX ",self.maxArea	
-
+					
+		print "WHITE",totalWhite,"BLACK",totalBlack,"MAX",self.maxArea
+		
 	def floodFill(self,current_x,current_y):
 		total = 0
 		toFill = set()
 		toFill.add((current_x,current_y))
-		while len(toFill)>0:
+		while len(toFill) > 0:
 			(x,y) = toFill.pop()
-			if ((x<0 or x>self.width) or (y<0 and y>self.height)):
+			if (x<0 or x>self.width-1 or y<0 and y>self.height-1):
 				continue
 			pixel = self.img_binary[x,y]
-			if not pixel == 255:
+			if pixel == 255:
 				continue
-			toFill.add((x-1,y))
-			toFill.add((x+1,y))
-			toFill.add((x,y-1))
-			toFill.add((x,y+1))
+			if (x-1,y) not in self.filled:
+				toFill.add((x-1,y))
+			if (x+1,y) not in self.filled:
+				toFill.add((x+1,y))
+			if (x,y-1) not in self.filled:
+				toFill.add((x,y-1))
+			if (x,y+1) not in self.filled:
+				toFill.add((x,y+1))
 			self.filled.add((x,y))
 			total=total+1
-			#print "To FIll ",toFill
-		#print "TOTAL",total
+			#toFill.discard((x,y))
 		if total > self.maxArea:
 			self.maxArea=total
 	
